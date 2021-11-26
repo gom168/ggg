@@ -90,8 +90,20 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.BasicAuthentication',
         'rest_framework.authentication.SessionAuthentication',
+        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
     ]
 }
+
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend' # 指定邮件后端
+EMAIL_HOST = 'smtp.163.com' # 发邮件主机        --需要根据邮箱更改
+EMAIL_PORT = 25 # 发邮件端口  /备用端口：465
+EMAIL_HOST_USER = 'gomyyds@163.com' # 授权的邮箱(发送)
+EMAIL_HOST_PASSWORD = 'ZLIHQZUSWSZOZNGG' # 邮箱授权时获得的密码，非注册登录密码
+EMAIL_FROM = 'Lenovo<gomyyds@163.com>' # 发件人抬头 <此处要和发送邮件的邮箱相同>
+SUBJECT = '邮箱验证'# 邮件标题
+
+
 
 
 

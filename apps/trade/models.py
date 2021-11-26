@@ -74,3 +74,5 @@ class OrderGoods(models.Model):
 
     def __str__(self):
         return self.order.order_sn
+
+

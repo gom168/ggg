@@ -11,7 +11,7 @@ from django.contrib.auth.models import AbstractUser
 
 class UserProfile(AbstractUser):
     '''用户'''
-    name = models.CharField(max_length=30, null=True, blank=True, verbose_name='姓名')
+    name = models.CharField(max_length=30, default=' ', blank=True, verbose_name='姓名')
     birthday = models.DateField(null=True, blank=True, verbose_name='出生日期')
     gender = models.CharField(max_length=6, choices=(('male', u'男'), ('female', u'女')), default='female',
                               verbose_name='性别')

@@ -3,10 +3,7 @@ from rest_framework import serializers
 from .models import Goods, GoodsCategory, GoodsImage, Banner, Settings
 
 
-class BannerSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Banner
-        fileds = '__all__'
+
 
 
 class GoodsImageSerializer(serializers.ModelSerializer):
@@ -55,4 +52,11 @@ class GoodsSerializer(serializers.ModelSerializer):
         model = Goods
         fields = '__all__'
 
+
+class BannerSerializer(serializers.ModelSerializer):
+    goods = GoodsSerializer()
+
+    class Meta:
+        model = Banner
+        fields = '__all__'
 

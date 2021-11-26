@@ -23,9 +23,12 @@ from rest_framework_jwt.views import obtain_jwt_token
 import xadmin
 
 from goods.views import GoodsListViewSet, CategoryViewSet, GoodsImageViewSet,BannerViewSet, SettingsViewSet,GoodsOfCategory
-from user_operation.views import UserFavViewSet,UserLeavingMessageViewSet
+from user_operation.views import UserFavViewSet, UserLeavingMessageViewSet, AddressViewSet
 
-from trade.views import ShoppingCartViewSet
+from trade.views import ShoppingCartViewSet, OrderViewSet
+
+from users.views import UserViewSet
+
 
 router = DefaultRouter()
 
@@ -47,10 +50,19 @@ router.register(r'shopcarts', ShoppingCartViewSet, basename='shopcarts')
 
 router.register(r'usercomment',UserLeavingMessageViewSet, basename='usercomment')
 
+router.register(r'user', UserViewSet ,basename='user')
+
+router.register(r'orders', OrderViewSet, basename='orders')
+
+router.register(r'address', AddressViewSet, basename= 'address')
+
 urlpatterns = [
     #path('admin/', admin.site.urls),
     url(r'^xadmin/', xadmin.site.urls),
     url(r'^', include(router.urls)),
+
+    #url(r'^register/$', register),
+    #url(r'^activate/(.*)/$', activate_user ,name='active'),
 
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
 
@@ -59,8 +71,7 @@ urlpatterns = [
 
     # JWT认证路由
     url(r'^login/', obtain_jwt_token),
-   # url(r'^settings/$', SettingsViewSet.as_view()),
-
+     # url(r'^settings/$', SettingsViewSet.as_view()),
 
 
     url(r'docs/', include_docs_urls(title='联想笔记本商城')),

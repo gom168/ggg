@@ -8,9 +8,11 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import SessionAuthentication
 from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 
-from .models import UserFav, UserLeavingMessage
-from .serializer import UserFavSerializer, UserLeavingMessageSerializer
+from .models import UserFav, UserLeavingMessage, UserAddress
+from .serializer import UserFavSerializer, UserLeavingMessageSerializer, UserFavDetailSerializer, AddressSerializer
 from .models import UserLeavingMessage
+#from .filter import UserLeavingMessageFilter
+from utils.permissions import IsOwnerOrReadOnly
 
 from django_filters.rest_framework import DjangoFilterBackend
 
@@ -45,25 +47,40 @@ import json
 
 class UserFavViewSet(mixins.CreateModelMixin, mixins.ListModelMixin, mixins.DestroyModelMixin, viewsets.GenericViewSet):
     '''用户收藏'''
-    permission_classes = [IsAuthenticated] #permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
+    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
     serializer_class = UserFavSerializer
     authentication_classes = [JSONWebTokenAuthentication, SessionAuthentication]
+    lookup_field = 'goods_id'
 
     def get_queryset(self):
         return UserFav.objects.filter(user=self.request.user, is_delete=False)
 
+    def get_serializer_class(self):
+        '''动态设置序列化'''
+        if self.action == 'list':
+            return UserFavDetailSerializer
+        elif self.action == 'create':
+            return UserFavSerializer
+        return UserFavSerializer
+
 
 class UserLeavingMessageViewSet(mixins.CreateModelMixin, mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.DestroyModelMixin, viewsets.GenericViewSet):
-    permission_classes = [IsAuthenticated]
-    lookup_field = 'good_sn'
-    serializer_class = UserLeavingMessageSerializer
+
+    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
     authentication_classes = [JSONWebTokenAuthentication, SessionAuthentication]
+    serializer_class = UserLeavingMessageSerializer
+    lookup_field = 'goods_sn'
 
     def get_queryset(self):
         return UserLeavingMessage.objects.filter(user=self.request.user, is_delete=False)
 
-    # queryset = UserLeavingMessage.objects.all()
-    #
-    # serializer_class = UserLeavingMessageSerializer
-    # filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
-    # #filter_class = CategoryOfgoodsFilter
+
+class AddressViewSet(viewsets.ModelViewSet):
+
+    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
+    authentication_classes = [JSONWebTokenAuthentication, SessionAuthentication]
+    serializer_class = AddressSerializer
+
+    def get_queryset(self):
+        return UserAddress.objects.filter(user=self.request.user, is_delete=False)
+
