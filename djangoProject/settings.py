@@ -94,6 +94,7 @@ REST_FRAMEWORK = {
     ]
 }
 
+REGIX_EMAIL='^.+\\@(\\[?)[a-zA-Z0-9\\-\\.]+\\.([a-zA-Z]{2,3}|[0-9]{1,3})(\\]?)$'
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend' # 指定邮件后端
 EMAIL_HOST = 'smtp.163.com' # 发邮件主机        --需要根据邮箱更改
@@ -102,6 +103,9 @@ EMAIL_HOST_USER = 'gomyyds@163.com' # 授权的邮箱(发送)
 EMAIL_HOST_PASSWORD = 'ZLIHQZUSWSZOZNGG' # 邮箱授权时获得的密码，非注册登录密码
 EMAIL_FROM = 'Lenovo<gomyyds@163.com>' # 发件人抬头 <此处要和发送邮件的邮箱相同>
 SUBJECT = '邮箱验证'# 邮件标题
+
+# 注册有效期天数
+CONFIRM_DAYS = 7
 
 
 

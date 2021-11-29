@@ -1,10 +1,11 @@
 import re
 from datetime import datetime, timedelta
-
+from django.db import models
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
-from .models import UserProfile
+from .models import UserProfile,VerifyCode
 from rest_framework.validators import UniqueValidator
+from djangoProject.settings import REGIX_EMAIL
 
 User = get_user_model()
 
@@ -22,10 +23,15 @@ class UserRegSerializer(serializers.ModelSerializer):
     username = serializers.CharField(required=True, allow_blank=False,  label='用户名', validators=[UniqueValidator(queryset=User.objects.filter(is_delete=False), message='用户已经存在')])
     password = serializers.CharField(label='密码',  write_only=True, style={'input_type': 'password'})
 
-    def validate_code(self, code):
-        verify_records = "//"
+    def create(self, validated_data):
+        user = super(UserRegSerializer, self).create(validated_data=validated_data)
+        user.set_password(validated_data['password'])
+        user.save()
+        return user
 
-       #VerifyCode.objects.filter(mobile=self.initial_data['username']).order_by('-add_time')
+    def validate_code(self, code):
+        verify_records = VerifyCode.objects.filter(email=self.initial_data['username']).order_by('-add_time')
+
 
         # 验证验证码是否存在
         if verify_records:
@@ -41,7 +47,7 @@ class UserRegSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError('数据有误，请重新验证')
 
     def validate(self, attrs):
-        attrs['mobile'] = attrs['username']
+        attrs['email'] = attrs['username']
         del attrs['code']
         return attrs
 
@@ -55,3 +61,27 @@ class UserDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserProfile
         fields = ['name', 'gender', 'birthday', 'email', 'mobile', 'password', 'username', 'image']
+
+
+class SmsSerializer(serializers.Serializer):
+    '''邮件发送序列化'''
+
+    email = models.CharField(max_length=30, verbose_name='邮箱')
+
+    def validate_mobile(self, email):
+        '''验证邮箱'''
+
+        #  验证邮件是否合法
+        if not re.match(REGIX_EMAIL, email):
+            raise serializers.ValidationError('手机号格式有误，请重新输入')
+
+        # 验证邮箱是否注册
+        if User.objects.filter(email=email).count():
+            raise serializers.ValidationError('邮箱已经被注册过，请更换邮箱重新注册或直接使用该邮箱登录')
+
+        # 验证短信发送频率
+        one_minute_ago = datetime.now() - timedelta(minutes=1)
+        if VerifyCode.objects.filter(add_time__gt=one_minute_ago, email=email).count():
+            raise serializers.ValidationError('验证码发送频率过快，请稍后再试')
+
+        return email

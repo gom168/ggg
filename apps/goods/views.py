@@ -26,7 +26,6 @@ import json
 # Create your views here.
 
 
-
 class GoodsPagination(PageNumberPagination):
     page_size = 10
     page_size_query_param = 'page_size'
@@ -64,31 +63,11 @@ class CategoryViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets
     serializer_class = CategorySerializer
 
 
-# @csrf_exempt
-# def SettingsViewSet(request):
-#     if request.method == "GET":
-#         req =
-
-
 class SettingsViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
     queryset = Settings.objects.all()
     serializer_class = SettingsSerializer
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
     filter_class = SettingsFilter
-
-
-# class SettingsViewSet(APIView):
-#     def get(self, request, *args, **kwargs):
-#         queryset = Settings.objects.all()
-#         obj = SettingsFilter()
-#         result = obj.filter_queryset(request, queryset, self)
-#         serializer = SettingsSerializer(queryset,many=True)
-#         return Response(serializer.data)
-
-
-# class GoodsOfCategoryViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
-#
-#     queryset = Goods.objects.filter(category_id="")
 
 
 class GoodsOfCategory(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
@@ -97,6 +76,7 @@ class GoodsOfCategory(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets
     serializer_class = GoodsSerializer
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
     filter_class = CategoryOfgoodsFilter
+
 
 
 
