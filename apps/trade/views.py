@@ -24,6 +24,7 @@ from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 # Create your views here.
 
 
+
 class ShoppingCartViewSet(viewsets.ModelViewSet):
     '''
     list:

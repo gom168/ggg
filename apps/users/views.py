@@ -133,6 +133,7 @@ class SmsCodeViewSet(CreateModelMixin, viewsets.GenericViewSet):
         serializer.is_valid(raise_exception=True)
 
         email = serializer.validated_data['email']
+        print(email)
         code = self.generate_code()
 
         send_email(email, code)

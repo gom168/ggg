@@ -67,14 +67,14 @@ class UserDetailSerializer(serializers.ModelSerializer):
 class SmsSerializer(serializers.Serializer):
     '''邮件发送序列化'''
 
-    email = models.CharField(max_length=30)
+    email = serializers.CharField(max_length=30)
 
     def validate_mobile(self, email):
         '''验证邮箱'''
 
         #  验证邮件是否合法
         if not re.match(REGIX_EMAIL, email):
-            raise serializers.ValidationError('手机号格式有误，请重新输入')
+            raise serializers.ValidationError('邮箱格式有误，请重新输入')
 
         # 验证邮箱是否注册
         if User.objects.filter(email=email).count():
