@@ -28,7 +28,7 @@ from user_operation.views import UserFavViewSet, UserLeavingMessageViewSet, Addr
 from notes.views import NotesViewSet, CommentViewSet
 from trade.views import ShoppingCartViewSet, OrderViewSet
 
-from users.views import UserViewSet,SmsCodeViewSet
+from users.views import UserViewSet, SmsCodeViewSet
 
 router = DefaultRouter()
 

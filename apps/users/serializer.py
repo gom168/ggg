@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from django.db import models
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
-from .models import UserProfile,VerifyCode
+from .models import UserProfile, VerifyCode
 from rest_framework.validators import UniqueValidator
 from djangoProject.settings import REGIX_EMAIL
 
@@ -20,8 +20,9 @@ class UserRegSerializer(serializers.ModelSerializer):
                                      'max_length': '请输入4位验证码',
                                      'min_length': '请输入4位验证码'
                                  })
-    username = serializers.CharField(required=True, allow_blank=False,  label='用户名', validators=[UniqueValidator(queryset=User.objects.filter(is_delete=False), message='用户已经存在')])
-    password = serializers.CharField(label='密码',  write_only=True, style={'input_type': 'password'})
+    username = serializers.CharField(required=True, allow_blank=False, label='用户名', validators=[
+        UniqueValidator(queryset=User.objects.filter(is_delete=False), message='用户已经存在')])
+    password = serializers.CharField(label='密码', write_only=True, style={'input_type': 'password'})
 
     def create(self, validated_data):
         user = super(UserRegSerializer, self).create(validated_data=validated_data)
@@ -31,7 +32,6 @@ class UserRegSerializer(serializers.ModelSerializer):
 
     def validate_code(self, code):
         verify_records = VerifyCode.objects.filter(email=self.initial_data['username']).order_by('-add_time')
-
 
         # 验证验证码是否存在
         if verify_records:
@@ -58,6 +58,7 @@ class UserRegSerializer(serializers.ModelSerializer):
 
 class UserDetailSerializer(serializers.ModelSerializer):
     '''用户详情序列化'''
+
     class Meta:
         model = UserProfile
         fields = ['name', 'gender', 'birthday', 'email', 'mobile', 'password', 'username', 'image']
@@ -66,7 +67,7 @@ class UserDetailSerializer(serializers.ModelSerializer):
 class SmsSerializer(serializers.Serializer):
     '''邮件发送序列化'''
 
-    email = models.CharField(max_length=30, verbose_name='邮箱')
+    email = models.CharField(max_length=30)
 
     def validate_mobile(self, email):
         '''验证邮箱'''

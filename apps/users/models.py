@@ -11,11 +11,11 @@ from django.contrib.auth.models import AbstractUser
 
 class UserProfile(AbstractUser):
     '''用户'''
-    name = models.CharField(max_length=30, default=' ', blank=True, verbose_name='姓名')
+    name = models.CharField(max_length=30, null=True, blank=True, verbose_name='姓名')
     birthday = models.DateField(null=True, blank=True, verbose_name='出生日期')
     gender = models.CharField(max_length=6, choices=(('male', u'男'), ('female', u'女')), default='female',
                               verbose_name='性别')
-    mobile = models.CharField(max_length=11, verbose_name='电话')
+    mobile = models.CharField(max_length=11, null=True, blank=True, verbose_name='电话')
     email = models.CharField(max_length=50, null=True, blank=True, verbose_name='邮箱')
 
     image = models.ImageField(upload_to='', null=True, blank=True, verbose_name='头像')
@@ -32,7 +32,7 @@ class UserProfile(AbstractUser):
 
 class VerifyCode(models.Model):
     code = models.CharField(max_length=10, verbose_name='验证码')
-    email = models.CharField(max_length=30, default=' ',verbose_name='邮箱')
+    email = models.CharField(max_length=30, verbose_name='邮箱')
 
     add_time = models.DateField(default=datetime.now, verbose_name='添加时间')
     is_delete = models.BooleanField(default=False, verbose_name='是否删除')
