@@ -27,9 +27,11 @@ sys.path.insert(0, os.path.join(BASE_DIR, 'extra_apps'))
 SECRET_KEY = 'django-insecure-(kv7_80+bfm9%9fzkgrb7k(2#c05r$@g(32h78$1_ame3uyrop'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'collected_static')
 
 AUTH_USER_MODEL = 'users.UserProfile'
 
