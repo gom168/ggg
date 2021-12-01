@@ -26,9 +26,10 @@ from goods.views import GoodsListViewSet, CategoryViewSet, GoodsImageViewSet, Ba
     GoodsOfCategory
 from user_operation.views import UserFavViewSet, UserLeavingMessageViewSet, AddressViewSet
 from notes.views import NotesViewSet, CommentViewSet
-from trade.views import ShoppingCartViewSet, OrderViewSet
+from trade.views import ShoppingCartViewSet, OrderViewSet, AlipayView
 
 from users.views import UserViewSet, SmsCodeViewSet
+
 
 router = DefaultRouter()
 
@@ -61,6 +62,8 @@ router.register(r'note', NotesViewSet, basename='note')
 router.register(r'note_comment', CommentViewSet, basename='note_comment')
 router.register(r'codes', SmsCodeViewSet, basename='codes')
 
+
+
 urlpatterns = [
     # path('admin/', admin.site.urls),
     url(r'^xadmin/', xadmin.site.urls),
@@ -79,4 +82,7 @@ urlpatterns = [
     # url(r'^settings/$', SettingsViewSet.as_view()),
 
     url(r'docs/', include_docs_urls(title='联想笔记本商城')),
+
+    # 配置支付宝支付相关接口的url
+    url(r'alipay/return/', AlipayView.as_view()),
 ]

@@ -15,7 +15,7 @@ import os
 import sys
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, BASE_DIR)
 sys.path.insert(0, os.path.join(BASE_DIR, 'apps'))
 sys.path.insert(0, os.path.join(BASE_DIR, 'extra_apps'))
@@ -27,13 +27,24 @@ sys.path.insert(0, os.path.join(BASE_DIR, 'extra_apps'))
 SECRET_KEY = 'django-insecure-(kv7_80+bfm9%9fzkgrb7k(2#c05r$@g(32h78$1_ame3uyrop'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = []
 
-STATIC_ROOT = os.path.join(BASE_DIR, 'collected_static')
+# 支付宝相关配置
+app_private_key_path = os.path.join(BASE_DIR, 'apps/trade/keys/private.txt')
+alipay_public_key_path = os.path.join(BASE_DIR, 'apps/trade/keys/ali_public.txt')
+ali_app_id = "2021000118658197"
+return_url = 'http://127.0.0.1:8000/alipay/return/'
+notify_url = 'http://127.0.0.1:8000/alipay/return/'
+
+#STATIC_ROOT = os.path.join(BASE_DIR, 'collected_static')
 
 AUTH_USER_MODEL = 'users.UserProfile'
+
+# 支付宝相关的key
+private_key_path = os.path.join(BASE_DIR, 'apps/trade/keys/private.txt')
+ali_pub_key_path = os.path.join(BASE_DIR, 'apps/trade/keys/ali_public.txt')
 
 # DRF配置
 REST_FRAMEWORK = {
@@ -132,8 +143,7 @@ ROOT_URLCONF = 'djangoProject.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates']
-        ,
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

@@ -40,7 +40,6 @@ kombu==5.2.2
 Markdown==3.3.4
 MarkupPy==1.14
 MarkupSafe==2.0.1
-mod-wsgi==4.9.0
 mysqlclient==2.0.3
 odfpy==1.4.1
 openpyxl==3.0.9
