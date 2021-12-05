@@ -1,5 +1,6 @@
 from rest_framework import permissions
 
+
 class IsOwnerOrReadOnly(permissions.BasePermission):
     '''对象级别的权限，仅允许对象的所有者对其进行编辑'''
 

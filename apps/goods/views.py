@@ -47,7 +47,7 @@ class GoodsImageViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin,viewset
 class GoodsListViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
     '''商品列表页，并实现分页、搜索、过滤、排序'''
 
-    queryset = Goods.objects.filter(is_delete=True).order_by('id')
+    queryset = Goods.objects.filter(is_delete=False).order_by('id')
     lookup_field = 'goods_sn'
     serializer_class = GoodsSerializer
     pagination_class = GoodsPagination
@@ -55,6 +55,14 @@ class GoodsListViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewset
     filter_class = GoodsFilter
     search_fields = ['name', 'goods_brief', 'goods_desc']
     ordering_fields = ['sold_num', 'price']
+
+    def retrieve(self, request, *args, **kwargs):
+        '''重写实现点击数'''
+        instance = self.get_object()
+        instance.click_num += 1
+        instance.save()
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
 
 
 class CategoryViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):

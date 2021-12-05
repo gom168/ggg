@@ -140,22 +140,22 @@ class ShoppingCartViewSet(viewsets.ModelViewSet):
         '''创建购物车更新库存量'''
         shop_cart = serializer.save()
         goods = shop_cart.goods
-        goods.goods_num -= shop_cart.nums
+        goods.goods_num -= shop_cart.goods_num
         goods.save()
 
     def perform_destroy(self, instance):
         '''删除购物车更新库存量'''
         goods = instance.goods
-        goods.goods_num += instance.nums
+        goods.goods_num += instance.goods_num
         goods.save()
         instance.delete()
 
     def perform_update(self, serializer):
         '''修改购物车更新库存量'''
         existed_record = ShoppingCart.objects.filter(is_delete=False).get(id=serializer.instance.id)
-        existed_nums = existed_record.nums
+        existed_goods_num = existed_record.goods_num
         saved_record = serializer.save()
-        nums = saved_record.nums - existed_nums
+        nums = saved_record.nums - existed_goods_num
         goods = saved_record.goods
         goods.goods_num -= nums
         goods.save()
@@ -188,12 +188,13 @@ class OrderViewSet(mixins.CreateModelMixin, mixins.ListModelMixin, mixins.Retrie
         order = serializer.save()
         shop_carts = ShoppingCart.objects.filter(user=self.request.user, is_delete=False)
         for shop_cart in shop_carts:
-            order_goods = OrderGoods()
-            order_goods.goods = shop_cart.goods
-            order_goods.goods_num = shop_cart.nums
-            order_goods.order = order
-            order_goods.save()
-            shop_cart.delete()
+            if shop_cart.is_choosen == True:
+                order_goods = OrderGoods()
+                order_goods.goods = shop_cart.goods
+                order_goods.goods_num = shop_cart.goods_num
+                order_goods.order = order
+                order_goods.save()
+                shop_cart.delete()
         return order
 
 

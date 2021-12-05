@@ -15,6 +15,7 @@ class ShoppingCart(models.Model):
     user = models.ForeignKey(User, verbose_name='用户', null=True, on_delete=models.SET_NULL)
     goods = models.ForeignKey(Goods, verbose_name='商品', null=True, on_delete=models.SET_NULL)
     goods_num = models.IntegerField(default=0, verbose_name='商品数量')
+    is_choosen = models.BooleanField(default=True,verbose_name='是否购买')
 
     add_time = models.DateTimeField(default=datetime.now, verbose_name=u'添加时间')
     is_delete = models.BooleanField(default=False, verbose_name='是否删除')

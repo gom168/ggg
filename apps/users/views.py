@@ -44,7 +44,7 @@ class CustomBackend(ModelBackend):
 
     def authenticate(self, request, username=None, password=None, **kwargs):
         try:
-            user = User.objects.get(Q(username=username) | Q(mobile=username))
+            user = User.objects.get(Q(username=username) | Q(email=username))
             if user.check_password(password) and user.is_delete != True:
                 return user
         except Exception as e:
@@ -60,12 +60,13 @@ class UserViewSet(CreateModelMixin, UpdateModelMixin, RetrieveModelMixin, viewse
 
     serializer_class = UserRegSerializer
     queryset = User.objects.filter(is_delete=False)
-    authentication_classes = [SessionAuthentication, JSONWebTokenAuthentication]
+    # lookup_field = 'username'
+    authentication_classes = [JSONWebTokenAuthentication]
 
     def get_permissions(self):
         '''动态设置权限'''
         if self.action == 'retrieve':
-            return [IsAuthenticated]
+            return [IsAuthenticated()]
         elif self.action == 'create':
             return []
         return []

@@ -35,7 +35,6 @@ class UserFavDetailSerializer(serializers.ModelSerializer):
 class UserFavSerializer(serializers.ModelSerializer):
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
 
-
     class Meta:
         model = UserFav
         fields = ['id', 'user', 'goods']

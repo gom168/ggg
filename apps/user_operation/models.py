@@ -65,7 +65,7 @@ class UserAddress(models.Model):
     signer_name = models.CharField(max_length=20, default='', verbose_name='签收人')
     signer_mobile = models.CharField(max_length=11, default='', verbose_name='联系电话')
 
-    add_time = models.DateField(default=datetime.now, verbose_name=u'添加时间')
+    add_time = models.DateTimeField(default=datetime.now, verbose_name=u'添加时间')
     is_delete = models.BooleanField(default=False, verbose_name='是否删除')
 
     class Meta:

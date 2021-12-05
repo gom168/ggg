@@ -36,10 +36,11 @@ class UserRegSerializer(serializers.ModelSerializer):
         # 验证验证码是否存在
         if verify_records:
             last_record = verify_records[0]
-            five_minute_ago = datetime.now() - timedelta(minutes=5)
-            # 验证验证码是否过期
-            if five_minute_ago > last_record.add_time:
-                raise serializers.ValidationError('验证码已过期，请重新验证')
+            print(last_record)
+            # five_minute_ago = datetime.now() - timedelta(minutes=5)
+            # # 验证验证码是否过期
+            # if five_minute_ago > last_record.add_time:
+            #     raise serializers.ValidationError('验证码已过期，请重新验证')
             # 验证验证码是否正确
             if last_record.code != code:
                 raise serializers.ValidationError('验证码错误')
@@ -60,7 +61,7 @@ class UserDetailSerializer(serializers.ModelSerializer):
     '''用户详情序列化'''
 
     class Meta:
-        model = UserProfile
+        model = User
         fields = ['name', 'gender', 'birthday', 'email', 'mobile', 'password', 'username', 'image']
 
 

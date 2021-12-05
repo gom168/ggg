@@ -4,8 +4,6 @@ from .models import Goods, GoodsCategory, GoodsImage, Banner, Settings
 
 
 
-
-
 class GoodsImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = GoodsImage

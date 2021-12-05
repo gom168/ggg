@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 
 from pathlib import Path
 import os
+import datetime
 import sys
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -41,6 +42,16 @@ notify_url = 'http://127.0.0.1:8000/alipay/return/'
 #STATIC_ROOT = os.path.join(BASE_DIR, 'collected_static')
 
 AUTH_USER_MODEL = 'users.UserProfile'
+
+# JWT配置
+JWT_AUTH = {
+    # 过期时间
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(days=7),
+    # 刷新过期时间
+    'JWT_REFRESH_EXPIRATION_DELTA': datetime.timedelta(days=30),
+    # 请求头前缀
+    'JWT_AUTH_HEADER_PREFIX': 'JWT',
+}
 
 # 支付宝相关的key
 private_key_path = os.path.join(BASE_DIR, 'apps/trade/keys/private.txt')
@@ -135,8 +146,7 @@ MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
 ]
 
-# 跨域访问设置
-CORS_ORIGIN_ALLOW_ALL = True
+
 
 ROOT_URLCONF = 'djangoProject.urls'
 
@@ -218,3 +228,31 @@ STATIC_URL = '/static/'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# 跨域增加忽略
+CORS_ALLOW_CREDENTIALS = True
+CORS_ORIGIN_ALLOW_ALL = True
+CORS_ORIGIN_WHITELIST = ()
+
+CORS_ALLOW_METHODS = (
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
+    'VIEW',
+)
+
+CORS_ALLOW_HEADERS = (
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+    'token',
+)

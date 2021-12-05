@@ -96,7 +96,7 @@ class ShoppingCartDetailSerializer(serializers.ModelSerializer):
 
 class ShoppingCartSerializer(serializers.Serializer):
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
-    nums = serializers.IntegerField(required=True, min_value=1, label='数量',
+    goods_num = serializers.IntegerField(required=True, min_value=1, label='数量',
                                     error_messages={
                                         'required': '请选择商品数量',
                                         'min_value': '商品数量至少为1'
@@ -106,12 +106,12 @@ class ShoppingCartSerializer(serializers.Serializer):
     def create(self, validated_data):
         '''新增数据'''
         user = self.context['request'].user
-        nums = validated_data['nums']
+        goods_num = validated_data['goods_num']
         goods = validated_data['goods']
         existed = ShoppingCart.objects.filter(is_delete=False, user=user, goods=goods)
         if existed:
             existed = existed[0]
-            existed.nums += 1
+            existed.goods_num += 1
             existed.save()
         else:
             existed = ShoppingCart.objects.create(**validated_data)
