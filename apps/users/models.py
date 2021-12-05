@@ -34,7 +34,7 @@ class VerifyCode(models.Model):
     code = models.CharField(max_length=10, verbose_name='验证码')
     email = models.CharField(max_length=30, verbose_name='邮箱')
 
-    add_time = models.DateField(default=datetime.now(), verbose_name='添加时间')
+    add_time = models.DateField(default=datetime.now, verbose_name='添加时间')
     is_delete = models.BooleanField(default=False, verbose_name='是否删除')
 
     class Meta:
