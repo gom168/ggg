@@ -19,6 +19,7 @@ from rest_framework.documentation import include_docs_urls
 from rest_framework.routers import DefaultRouter
 from rest_framework.authtoken import views
 from rest_framework_jwt.views import obtain_jwt_token
+from djangoProject.settings import MEDIA_ROOT
 
 import xadmin
 
@@ -26,7 +27,7 @@ from goods.views import GoodsListViewSet, CategoryViewSet, GoodsImageViewSet, Ba
     GoodsOfCategory
 from user_operation.views import UserFavViewSet, UserLeavingMessageViewSet, AddressViewSet
 from notes.views import NotesViewSet, CommentViewSet
-from trade.views import ShoppingCartViewSet, OrderViewSet, AlipayView
+from trade.views import ShoppingCartViewSet, OrderViewSet, AlipayView, OrderGoodsViewSet
 
 from users.views import UserViewSet, SmsCodeViewSet
 
@@ -62,6 +63,7 @@ router.register(r'note', NotesViewSet, basename='note')
 router.register(r'note_comment', CommentViewSet, basename='note_comment')
 router.register(r'codes', SmsCodeViewSet, basename='codes')
 
+router.register(r'order_goods',OrderGoodsViewSet,basename='order_goods')
 
 
 urlpatterns = [
@@ -85,4 +87,6 @@ urlpatterns = [
 
     # 配置支付宝支付相关接口的url
     url(r'alipay/return/', AlipayView.as_view()),
+
+    url(r'^media/(?P<path>.*)$', serve, {'document_root': MEDIA_ROOT}),
 ]

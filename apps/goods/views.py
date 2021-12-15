@@ -5,7 +5,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 
 from .models import Goods, GoodsCategory, GoodsImage, Banner, Settings
 from .serializers import GoodsSerializer, CategorySerializer, GoodsImageSerializer, BannerSerializer, SettingsSerializer
-from .filters import GoodsFilter,SettingsFilter, CategoryOfgoodsFilter
+from .filters import GoodsFilter, SettingsFilter, CategoryOfgoodsFilter
 
 from rest_framework.views import APIView
 from rest_framework.response import Response

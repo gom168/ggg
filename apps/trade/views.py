@@ -1,5 +1,5 @@
-
-from .Serializers import ShoppingCartSerializer,ShoppingCartDetailSerializer,OrderSerializer,OrderDetailSerializer
+from .Serializers import ShoppingCartSerializer, ShoppingCartDetailSerializer, OrderSerializer, OrderDetailSerializer, \
+    OrderGoodsSerializer, OrderGoods2Serializer, OrderGoodsDetailSerializer
 from .models import ShoppingCart, OrderInfo, OrderGoods
 
 from django.http import HttpResponseRedirect
@@ -8,18 +8,21 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import SessionAuthentication
 from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 
-
 from datetime import datetime
 from utils.alipay import AliPay
 from rest_framework.views import APIView
-from djangoProject.settings import ali_pub_key_path, private_key_path
+from djangoProject.settings import ali_pub_key_path, private_key_path,notify_url,return_url
 from rest_framework.response import Response
 from utils.permissions import IsOwnerOrReadOnly
 from djangoProject.settings import app_private_key_path, alipay_public_key_path, ali_app_id, return_url, notify_url
+from django_filters.rest_framework import DjangoFilterBackend
+import django_filters.rest_framework
+from .filters import OrderGoodsFilter
 
 
 class AlipayView(APIView):
     def get(self, request):
+        print("hello")
         """
         处理支付宝的return_url返回
         """
@@ -30,14 +33,16 @@ class AlipayView(APIView):
         # 2. 取出sign
         sign = processed_dict.pop("sign", None)
 
+        print("1111111111111111111111111111111")
+
         # 3. 生成ALipay对象
         alipay = AliPay(
             appid="2021000118658197",
-            app_notify_url="http://47.93.198.159:8000/alipay/return/",
+            app_notify_url=notify_url,
             app_private_key_path=private_key_path,
             alipay_public_key_path=ali_pub_key_path,  # 支付宝的公钥，验证支付宝回传消息使用，不是你自己的公钥,
             debug=True,  # 默认False,
-            return_url="http://47.93.198.159:8000/alipay/return/"
+            return_url=return_url
         )
 
         verify_re = alipay.verify(processed_dict, sign)
@@ -48,47 +53,49 @@ class AlipayView(APIView):
             trade_no = processed_dict.get('trade_no', None)
             trade_status = processed_dict.get('trade_status', None)
 
+
             existed_orders = OrderInfo.objects.filter(order_sn=order_sn)
             for existed_order in existed_orders:
-                existed_order.pay_status = trade_status
+                existed_order.pay_status = True
                 existed_order.trade_no = trade_no
                 existed_order.pay_time = datetime.now()
                 existed_order.save()
-
+        return HttpResponseRedirect('http://localhost:8080/#/helloHome')
 
     def post(self, request):
         """
         处理支付宝的notify_url
         """
-        #存放post里面所有的数据
+        # 存放post里面所有的数据
         processed_dict = {}
-        #取出post里面的数据
+        # 取出post里面的数据
         for key, value in request.POST.items():
             processed_dict[key] = value
-        #把signpop掉，文档有说明
+        # 把signpop掉，文档有说明
         sign = processed_dict.pop("sign", None)
 
-        #生成一个Alipay对象
+        # 生成一个Alipay对象
         alipay = AliPay(
             appid="2021000118658197",
-            app_notify_url="http://47.93.198.159:8000/alipay/return/",
+            app_notify_url=notify_url,
             app_private_key_path=private_key_path,
             alipay_public_key_path=ali_pub_key_path,  # 支付宝的公钥，验证支付宝回传消息使用，不是你自己的公钥,
             debug=True,  # 默认False,
-            return_url="http://47.93.198.159:8000/alipay/return/"
+            return_url=return_url
         )
 
-        #进行验证
+        # 进行验证
         verify_re = alipay.verify(processed_dict, sign)
 
         # 如果验签成功
         if verify_re is True:
-            #商户网站唯一订单号
+            # 商户网站唯一订单号
             order_sn = processed_dict.get('out_trade_no', None)
-            #支付宝系统交易流水号
+            # 支付宝系统交易流水号
             trade_no = processed_dict.get('trade_no', None)
-            #交易状态
+            # 交易状态
             trade_status = processed_dict.get('trade_status', None)
+
 
             # 查询数据库中订单记录
             existed_orders = OrderInfo.objects.filter(order_sn=order_sn)
@@ -102,12 +109,13 @@ class AlipayView(APIView):
                     goods.save()
 
                 # 更新订单状态
-                existed_order.pay_status = trade_status
+                existed_order.pay_status = True
                 existed_order.trade_no = trade_no
                 existed_order.pay_time = datetime.now()
                 existed_order.save()
-            #需要返回一个'success'给支付宝，如果不返回，支付宝会一直发送订单支付成功的消息
+            # 需要返回一个'success'给支付宝，如果不返回，支付宝会一直发送订单支付成功的消息
             return Response("success")
+        return HttpResponseRedirect('http://localhost:8080/#/helloHome')
 
 
 class ShoppingCartViewSet(viewsets.ModelViewSet):
@@ -155,13 +163,14 @@ class ShoppingCartViewSet(viewsets.ModelViewSet):
         existed_record = ShoppingCart.objects.filter(is_delete=False).get(id=serializer.instance.id)
         existed_goods_num = existed_record.goods_num
         saved_record = serializer.save()
-        nums = saved_record.nums - existed_goods_num
+        nums = saved_record.goods_num - existed_goods_num
         goods = saved_record.goods
         goods.goods_num -= nums
         goods.save()
 
 
-class OrderViewSet(mixins.CreateModelMixin, mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.DestroyModelMixin, viewsets.GenericViewSet):
+class OrderViewSet(mixins.CreateModelMixin, mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.DestroyModelMixin,
+                   viewsets.GenericViewSet):
     '''
     订单管理
     list:
@@ -187,16 +196,49 @@ class OrderViewSet(mixins.CreateModelMixin, mixins.ListModelMixin, mixins.Retrie
     def perform_create(self, serializer):
         order = serializer.save()
         shop_carts = ShoppingCart.objects.filter(user=self.request.user, is_delete=False)
-        for shop_cart in shop_carts:
-            if shop_cart.is_choosen == True:
-                order_goods = OrderGoods()
-                order_goods.goods = shop_cart.goods
-                order_goods.goods_num = shop_cart.goods_num
-                order_goods.order = order
-                order_goods.save()
-                shop_cart.delete()
+        if order.buy_only == False:
+            for shop_cart in shop_carts:
+                if shop_cart.is_choosen == False:
+                    order_goods = OrderGoods()
+                    order_goods.goods = shop_cart.goods
+                    order_goods.goods_num = shop_cart.goods_num
+                    order_goods.order = order
+                    order_goods.save()
+                    shop_cart.delete()
         return order
 
+
+class OrderGoodsViewSet(mixins.CreateModelMixin, mixins.ListModelMixin, mixins.RetrieveModelMixin,
+                        mixins.DestroyModelMixin, viewsets.GenericViewSet):
+    serializer_class = OrderGoods2Serializer
+    filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
+    filter_class = OrderGoodsFilter
+
+    def get_queryset(self):
+        return OrderGoods.objects.filter(is_delete=False)
+
+    def get_serializer_class(self):
+        if self.action == 'list':
+            return OrderGoodsDetailSerializer
+        else:
+            return OrderGoods2Serializer
+
+    def perform_create(self, serializer):
+        order_goods = serializer.save()
+
+        return order_goods
+
+        # order = serializer.save()
+        # shop_carts = ShoppingCart.objects.filter(user=self.request.user, is_delete=False)
+        # for shop_cart in shop_carts:
+        #     if shop_cart.is_choosen == False:
+        #         order_goods = OrderGoods()
+        #         order_goods.goods = shop_cart.goods
+        #         order_goods.goods_num = shop_cart.goods_num
+        #         order_goods.order = order
+        #         order_goods.save()
+        #         shop_cart.delete()
+        # return order
 
 # class AliPayView(APIView):
 #

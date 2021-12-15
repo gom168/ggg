@@ -6,6 +6,7 @@ import time
 from djangoProject.settings import app_private_key_path, alipay_public_key_path, ali_app_id, return_url, notify_url
 import random
 from utils.alipay import AliPay
+import datetime
 
 
 class OrderGoodsSerializer(serializers.ModelSerializer):
@@ -16,18 +17,27 @@ class OrderGoodsSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class OrderGoods2Serializer(serializers.ModelSerializer):
+    goods = serializers.PrimaryKeyRelatedField(required=True, queryset=Goods.objects.filter(is_delete=False))
+    order = serializers.PrimaryKeyRelatedField(required=True, queryset=OrderInfo.objects.filter(is_delete=False))
+
+    class Meta:
+        model = OrderGoods
+        fields = '__all__'
+
+
 class OrderDetailSerializer(serializers.ModelSerializer):
-    goods = OrderGoodsSerializer(many=True)
+    # goods = OrderGoodsSerializer(many=True)
     alipay_url = serializers.SerializerMethodField(read_only=True)
 
     def get_alipay_url(self, obj):
         alipay = AliPay(
             appid=ali_app_id,
-            app_notify_url="http://localhost:8080/helloHome/",
+            app_notify_url=notify_url,
             app_private_key_path=app_private_key_path,
             alipay_public_key_path=alipay_public_key_path,  # 支付宝的公钥，验证支付宝回传消息使用，不是你自己的公钥,
             debug=True,  # 默认False,
-            return_url="http://localhost:8080/helloHome/"
+            return_url=return_url
         )
 
         url = alipay.direct_pay(
@@ -49,7 +59,7 @@ class OrderSerializer(serializers.ModelSerializer):
     pay_status = serializers.CharField(read_only=True)
     trade_no = serializers.CharField(read_only=True)
     order_sn = serializers.CharField(read_only=True)
-    pay_time = serializers.DateTimeField(read_only=True)
+    pay_time = serializers.DateTimeField(read_only=True, default=datetime.datetime.now())
     is_delete = serializers.BooleanField(read_only=True)
 
     alipay_url = serializers.SerializerMethodField(read_only=True)
@@ -57,11 +67,11 @@ class OrderSerializer(serializers.ModelSerializer):
     def get_alipay_url(self, obj):
         alipay = AliPay(
             appid=ali_app_id,
-            app_notify_url="http://localhost:8080/helloHome/",
+            app_notify_url=notify_url,
             app_private_key_path=app_private_key_path,
             alipay_public_key_path=alipay_public_key_path,  # 支付宝的公钥，验证支付宝回传消息使用，不是你自己的公钥,
             debug=True,  # 默认False,
-            return_url="http://localhost:8080/helloHome/"
+            return_url=return_url
         )
 
         url = alipay.direct_pay(
@@ -94,6 +104,14 @@ class ShoppingCartDetailSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class OrderGoodsDetailSerializer(serializers.ModelSerializer):
+    goods = GoodsSerializer(many=False)
+
+    class Meta:
+        model = OrderGoods
+        fields = '__all__'
+
+
 class ShoppingCartSerializer(serializers.Serializer):
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
     goods_num = serializers.IntegerField(required=True, min_value=1, label='数量',
@@ -101,6 +119,7 @@ class ShoppingCartSerializer(serializers.Serializer):
                                         'required': '请选择商品数量',
                                         'min_value': '商品数量至少为1'
                                     })
+    is_choosen = serializers.BooleanField(default=True,label='选中')
     goods = serializers.PrimaryKeyRelatedField(required=True, queryset=Goods.objects.filter(is_delete=False))
 
     def create(self, validated_data):
@@ -111,7 +130,7 @@ class ShoppingCartSerializer(serializers.Serializer):
         existed = ShoppingCart.objects.filter(is_delete=False, user=user, goods=goods)
         if existed:
             existed = existed[0]
-            existed.goods_num += 1
+            existed.goods_num += goods_num
             existed.save()
         else:
             existed = ShoppingCart.objects.create(**validated_data)
@@ -119,7 +138,8 @@ class ShoppingCartSerializer(serializers.Serializer):
 
     def update(self, instance, validated_data):
         # 修改购物车商品数量
-        instance.nums = validated_data['nums']
+        instance.goods_num = validated_data['goods_num']
+        instance.is_choosen = validated_data['is_choosen']
         instance.save()
         return instance
 

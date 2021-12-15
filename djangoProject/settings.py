@@ -36,10 +36,14 @@ ALLOWED_HOSTS = []
 app_private_key_path = os.path.join(BASE_DIR, 'apps/trade/keys/private.txt')
 alipay_public_key_path = os.path.join(BASE_DIR, 'apps/trade/keys/ali_public.txt')
 ali_app_id = "2021000118658197"
-return_url = 'http://localhost:8080/helloHome/'
-notify_url = 'http://localhost:8080/helloHome/'
+return_url = 'http://127.0.0.1:8000/alipay/return/'
+notify_url = 'http://127.0.0.1:8000/alipay/return/'
 
 #STATIC_ROOT = os.path.join(BASE_DIR, 'collected_static')
+
+# 媒体资源设置
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 AUTH_USER_MODEL = 'users.UserProfile'
 
